@@ -1,19 +1,12 @@
-rect = {}
-rect.___index = rect
-
-function rect.new(x, y, w, h)
-    local self = setmetatable({}, rect)
-    self.x = x or 0
-    self.y = y or 0
-    self.w = w or 0
-    self.h = h or 0
-    return self
-end
-
 r1 = {}
 
 function love.load()
-  r1 = rect.new(90, 30, 18, 8)
+  r1 = {
+      x = 90,
+      y = 30,
+      w = 18,
+      h = 8
+    }
 end
 
 function love.update()
