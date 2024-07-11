@@ -35,6 +35,7 @@ local screen_height = 0
 local score = 0
 
 local is_paused = false
+local is_game_over = false
 
 -- Using metatables to create a read-only table for constants
 local function read_only(t)
@@ -59,13 +60,12 @@ local rects = {}
 local rect = {}
 local player_rect = { x = 50, y = 575, w = 100, h = 20 }
 
-function love.load()
-    love.window.setTitle("Classic Game")
-    
-    -- Set the background color to black
-    love.graphics.setBackgroundColor(0, 0, 0)
+function init_rects()
+  for i in ipairs(rects) do
+      rects[i] = nil
+  end
   
-    for i = 1, 16 do
+  for i = 1, 16 do
         table.insert(rects, {
             x = (i - 1) * CONST.RECT_W,
             y = 50,
@@ -104,10 +104,19 @@ function love.load()
             id = i + 16 * 4
         })
     end
+end
+
+function love.load()
+    love.window.setTitle("Classic Game")
+    
+    -- Set the background color to black
+    love.graphics.setBackgroundColor(0, 0, 0)
 
     -- Collision status
     is_colliding_rects = false
     is_colliding_player = false
+    
+    init_rects()
     
     rect = {
         x = 100,
@@ -138,6 +147,15 @@ function love.keypressed(key)
     if key == "p" then
         is_paused = not is_paused
     end
+    
+    if key == "return" and is_game_over then
+        is_game_over = not is_game_over
+        rect.y = 300
+        
+        init_rects()
+        
+        score = 0
+    end
 end
 
 function love.update(dt)    
@@ -151,10 +169,12 @@ function love.update(dt)
     -- Clamp the player_rect.x value between 0 and 700
     player_rect.x = math.max(0, math.min(700, player_rect.x))
   
-    if not is_paused then
+    if not is_paused and not is_game_over then
         -- Update the rectangle's position
-        rect.x = rect.x + rect.speed_x * dt
-        rect.y = rect.y + rect.speed_y * dt
+        if not is_game_over then
+          rect.x = rect.x + rect.speed_x * dt
+          rect.y = rect.y + rect.speed_y * dt
+        end
     end
 
     -- Check for collision between the rect and all other rectangles
@@ -192,13 +212,17 @@ function love.update(dt)
             rect.speed_y = -rect.speed_y  -- Reverse the vertical direction
         end
     end
+    
+    if rect.y > screen_width and is_game_over == false then
+      is_game_over = true
+    end
 end
 
 function love.draw()
     -- Draw the rectangles
     for i, rect in ipairs(rects) do
         if rect.id ~= 99 then
-            love.graphics.setColor(0, 0, 1)  -- Blue for non-collided rectangles
+            love.graphics.setColor(0, 0, 1)
             love.graphics.rectangle("fill", rect.x, rect.y, rect.w, rect.h)
         end
     end
@@ -218,5 +242,9 @@ function love.draw()
     
     if is_paused then
       love.graphics.print("Paused", screen_width/2-50, screen_height/2, 0, 3, 3)
+    end
+    
+    if is_game_over then
+      love.graphics.print("Game Over", screen_width/2-100, screen_height/2-50, 0, 3, 3)
     end
 end
