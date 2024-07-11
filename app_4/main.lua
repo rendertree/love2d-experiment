@@ -171,10 +171,8 @@ function love.update(dt)
   
     if not is_paused and not is_game_over then
         -- Update the rectangle's position
-        if not is_game_over then
-          rect.x = rect.x + rect.speed_x * dt
-          rect.y = rect.y + rect.speed_y * dt
-        end
+        rect.x = rect.x + rect.speed_x * dt
+        rect.y = rect.y + rect.speed_y * dt
     end
 
     -- Check for collision between the rect and all other rectangles
