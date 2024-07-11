@@ -34,6 +34,8 @@ local screen_height = 0
 
 local score = 0
 
+local is_paused = false
+
 -- Using metatables to create a read-only table for constants
 local function read_only(t)
     local proxy = {}
@@ -132,7 +134,13 @@ function check_collision_rect(a, b)
     end
 end
 
-function love.update(dt)
+function love.keypressed(key)
+    if key == "p" then
+        is_paused = not is_paused
+    end
+end
+
+function love.update(dt)    
     -- Handle player rectangle movement
     if love.keyboard.isDown("right") or love.keyboard.isDown("d") then
         player_rect.x = player_rect.x + SPEED * dt
@@ -142,10 +150,12 @@ function love.update(dt)
 
     -- Clamp the player_rect.x value between 0 and 700
     player_rect.x = math.max(0, math.min(700, player_rect.x))
-
-    -- Update the rectangle's position
-    rect.x = rect.x + rect.speed_x * dt
-    rect.y = rect.y + rect.speed_y * dt
+  
+    if not is_paused then
+        -- Update the rectangle's position
+        rect.x = rect.x + rect.speed_x * dt
+        rect.y = rect.y + rect.speed_y * dt
+    end
 
     -- Check for collision between the rect and all other rectangles
     local move_rect = { x = rect.x, y = rect.y, w = rect.w, h = rect.h }
@@ -185,7 +195,7 @@ function love.update(dt)
 end
 
 function love.draw()
-    -- Draw all rectangles
+    -- Draw the rectangles
     for i, rect in ipairs(rects) do
         if rect.id ~= 99 then
             love.graphics.setColor(0, 0, 1)  -- Blue for non-collided rectangles
@@ -193,7 +203,7 @@ function love.draw()
         end
     end
 
-    -- Draw the rect
+    -- Draw the move rect
     love.graphics.setColor(1, 0, 0)  -- Red for the moving rect
     love.graphics.rectangle("fill", rect.x, rect.y, rect.w, rect.h)
     
@@ -205,4 +215,8 @@ function love.draw()
     love.graphics.setColor(1, 1, 1)  -- White text
     local score_text = "Score: " .. tostring(score)
     love.graphics.print(score_text, 10, 10)
+    
+    if is_paused then
+      love.graphics.print("Paused", screen_width/2-50, screen_height/2, 0, 3, 3)
+    end
 end
