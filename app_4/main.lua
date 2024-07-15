@@ -193,7 +193,7 @@ function love.update(dt)
     end
 
     -- Handle collision detection
-    if is_colliding_rects then
+    if is_colliding_rects or rect.y < 0 then
         -- Move the rect to the bottom of the screen and stop vertical movement
         rect.speed_y = -rect.speed_y  -- Reverse the horizontal direction
     else
