@@ -34,8 +34,8 @@ local screen_height = 0
 
 local score = 0
 
-local is_paused = false
-local is_game_over = false
+local paused = false
+local game_over = false
 
 -- Using metatables to create a read-only table for constants
 local function read_only(t)
@@ -145,11 +145,11 @@ end
 
 function love.keypressed(key)
     if key == "p" then
-        is_paused = not is_paused
+        paused = not paused
     end
     
-    if key == "return" and is_game_over then
-        is_game_over = not is_game_over
+    if key == "return" and game_over then
+        game_over = not game_over
         rect.y = 300
         
         init_rects()
@@ -169,7 +169,7 @@ function love.update(dt)
     -- Clamp the player_rect.x value between 0 and 700
     player_rect.x = math.max(0, math.min(700, player_rect.x))
   
-    if not is_paused and not is_game_over then
+    if not paused and not game_over then
         -- Update the rectangle's position
         rect.x = rect.x + rect.speed_x * dt
         rect.y = rect.y + rect.speed_y * dt
@@ -195,24 +195,24 @@ function love.update(dt)
     -- Handle collision detection
     if is_colliding_rects or rect.y < 0 then
         -- Move the rect to the bottom of the screen and stop vertical movement
-        rect.speed_y = -rect.speed_y  -- Reverse the horizontal direction
+        rect.speed_y = -rect.speed_y
     else
         -- Check for collision with the screen boundaries and reverse direction if needed
         if rect.x < 0 then
             rect.x = 0
-            rect.speed_x = -rect.speed_x  -- Reverse the horizontal direction
+            rect.speed_x = -rect.speed_x
         elseif rect.x + rect.w > screen_width then
             rect.x = screen_width - rect.w
-            rect.speed_x = -rect.speed_x  -- Reverse the horizontal direction
+            rect.speed_x = -rect.speed_x
         end
 
         if is_colliding_player then
-            rect.speed_y = -rect.speed_y  -- Reverse the vertical direction
+            rect.speed_y = -rect.speed_y
         end
     end
     
-    if rect.y > screen_width and is_game_over == false then
-      is_game_over = true
+    if rect.y > screen_width and not game_over then
+      game_over = true
     end
 end
 
@@ -238,11 +238,11 @@ function love.draw()
     local score_text = "Score: " .. tostring(score)
     love.graphics.print(score_text, 10, 10)
     
-    if is_paused then
+    if paused then
       love.graphics.print("Paused", screen_width/2-50, screen_height/2, 0, 3, 3)
     end
     
-    if is_game_over then
+    if game_over then
       love.graphics.print("Game Over", screen_width/2-100, screen_height/2-50, 0, 3, 3)
     end
 end
