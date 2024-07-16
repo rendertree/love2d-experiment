@@ -33,6 +33,7 @@ local screen_width = 0
 local screen_height = 0
 
 local score = 0
+local rects_total = 0
 
 local paused = false
 local game_over = false
@@ -104,6 +105,8 @@ function init_rects()
             id = i + 16 * 4
         })
     end
+
+    rects_total = #rects
 end
 
 function love.load()
@@ -211,7 +214,7 @@ function love.update(dt)
         end
     end
     
-    if rect.y > screen_width and not game_over then
+    if rect.y > screen_width and not game_over or score == rects_total then
       game_over = true
     end
 end
